@@ -21,9 +21,19 @@ description:         Please see the README on GitHub at <https://github.com/zdra
 
 dependencies:
 - base >= 4.7 && < 5
+- classy-prelude
+- time
+- pcre-heavy
+- aeson
+
 
 library:
   source-dirs: src
+
+default-extensions:
+- NoImplicitPrelude
+- OverloadedStrings
+- QuasiQuotes
 
 executables:
   haskell-auth-exe:
