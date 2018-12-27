@@ -10,6 +10,23 @@ import           Text.Regex.PCRE.Heavy
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
 
+type VerificationCode = Text
+
+class Monad m => AuthRepo m
+  where
+  addAuth :: Auth -> m (Either RegistrationError VerificationCode)
+
+class Monad m =>
+      EmailVerificationNotif m
+  where
+  notifyEmailVerification :: Email -> VerificationCode -> m ()
+
+register
+  :: (AuthRepo m, EmailVerificationNotif m)
+  => Auth
+  -> m (Either RegistrationError ())
+register auth = undefined
+
 newtype Email = Email
   { emailRaw :: Text
   } deriving (Show, Eq)
@@ -23,7 +40,6 @@ mkEmail = validate
   [ regexMatches [re|^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,64}$|]
                  "Not a valid email"
   ]
-
 
 newtype Password = Password
   { passwordRaw :: Text
@@ -40,7 +56,6 @@ mkPassword = validate
   , regexMatches [re|[A-Z]|] "Should contain uppercase letter"
   , regexMatches [re|[a-z]|] "Should contain lowercase letter"
   ]
-
 
 data Auth = Auth
   { authEmail    :: Text
