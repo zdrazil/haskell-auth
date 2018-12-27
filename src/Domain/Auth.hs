@@ -4,6 +4,8 @@ module Domain.Auth
 where
 
 import           ClassyPrelude
+import           Domain.Validation
+import           Text.Regex.PCRE.Heavy
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -16,7 +18,12 @@ rawEmail :: Email -> Text
 rawEmail = emailRaw
 
 mkEmail :: Text -> Either [Text] Email
-mkEmail = undefined
+mkEmail = validate
+  Email
+  [ regexMatches [re|^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,64}$|]
+                 "Not a valid email"
+  ]
+
 
 newtype Password = Password
   { passwordRaw :: Text
@@ -26,7 +33,14 @@ rawPassword :: Password -> Text
 rawPassword = passwordRaw
 
 mkPassword :: Text -> Either [Text] Password
-mkPassword = undefined
+mkPassword = validate
+  Password
+  [ lengthBetween 5 50 "Should between 5 and 50"
+  , regexMatches [re|\d|]    "Should contain number"
+  , regexMatches [re|[A-Z]|] "Should contain uppercase letter"
+  , regexMatches [re|[a-z]|] "Should contain lowercase letter"
+  ]
+
 
 data Auth = Auth
   { authEmail    :: Text

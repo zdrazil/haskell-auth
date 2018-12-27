@@ -1,4 +1,9 @@
-module Domain.Validation where
+module Domain.Validation
+  ( validate
+  , lengthBetween
+  , regexMatches
+  )
+where
 
 import           ClassyPrelude
 import           Text.Regex.PCRE.Heavy
