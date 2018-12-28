@@ -1,3 +1,4 @@
+-- Page 46
 module Domain.Auth
   ( someFunc
   )
@@ -6,6 +7,7 @@ where
 import           ClassyPrelude
 import           Domain.Validation
 import           Text.Regex.PCRE.Heavy
+import           Control.Monad.Except
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -25,7 +27,11 @@ register
   :: (AuthRepo m, EmailVerificationNotif m)
   => Auth
   -> m (Either RegistrationError ())
-register auth = undefined
+register auth = runExceptT $ do
+  vCode <- ExceptT $ addAuth auth
+  let email = authEmail auth
+  lift $ notifyEmailVerification email vCode
+
 
 newtype Email = Email
   { emailRaw :: Text
@@ -58,8 +64,8 @@ mkPassword = validate
   ]
 
 data Auth = Auth
-  { authEmail    :: Text
-  , authPassword :: Text
+  { authEmail    :: Email
+  , authPassword :: Password
   } deriving (Show, Eq)
 
 data RegistrationError =
