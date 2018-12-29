@@ -21,11 +21,12 @@ description: Please see the README on GitHub at <https://github.com/zdrazil/hask
 
 dependencies:
   - base >= 4.7 && < 5
-  - classy-prelude
-  - time
-  - pcre-heavy
   - aeson
+  - classy-prelude
+  - data-has
   - mtl
+  - pcre-heavy
+  - time
 
 library:
   source-dirs: src
@@ -34,6 +35,8 @@ default-extensions:
   - NoImplicitPrelude
   - OverloadedStrings
   - QuasiQuotes
+  - ConstraintKinds
+  - FlexibleContexts
 
 executables:
   haskell-auth-exe:
