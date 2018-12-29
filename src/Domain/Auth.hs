@@ -46,6 +46,10 @@ data Auth = Auth
   , authPassword :: Password
   } deriving (Show, Eq)
 
+data EmailVerificationError =
+  EmailVerificationInvalidCode
+  deriving (Show, Eq)
+
 data RegistrationError =
   RegistrationErrorEmailTaken
   deriving (Show, Eq)
@@ -57,6 +61,7 @@ class Monad m =>
       AuthRepo m
   where
   addAuth :: Auth -> m (Either RegistrationError VerificationCode)
+  setEmailAsVerified :: VerificationCode -> m (Either EmailVerificationError ())
 
 class Monad m =>
       EmailVerificationNotif m
@@ -68,10 +73,16 @@ instance AuthRepo IO where
   addAuth (Auth email pass) = do
     putStrLn $ "adding auth: " <> rawEmail email
     return $ Right "fake verification code"
+  setEmailAsVerified (vcode) = do
+    putStrLn $ "email verified: " <> vcode
+    return $ Right ()
 
 instance EmailVerificationNotif IO where
   notifyEmailVerification email vcode =
     putStrLn $ "Notify " <> rawEmail email <> " - " <> vcode
+
+verifyEmail :: AuthRepo m => VerificationCode -> m (Either EmailVerificationError ())
+verifyEmail = setEmailAsVerified
 
 
 register
