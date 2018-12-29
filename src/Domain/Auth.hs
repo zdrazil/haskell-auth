@@ -1,3 +1,5 @@
+{-# LANGUAGE QuasiQuotes #-}
+
 module Domain.Auth
   ( someFunc
   ) where
