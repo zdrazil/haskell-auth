@@ -50,18 +50,31 @@ data EmailVerificationError =
   EmailVerificationInvalidCode
   deriving (Show, Eq)
 
+data LoginError  = LoginErrorInvalidAuth | LoginErrorEmailNotVerified
+  deriving (Show, Eq)
+
 data RegistrationError =
   RegistrationErrorEmailTaken
   deriving (Show, Eq)
 
+
+type UserId = Int
+
 type VerificationCode = Text
+
+type SessionId = Text
 
 
 class Monad m =>
       AuthRepo m
   where
   addAuth :: Auth -> m (Either RegistrationError VerificationCode)
+  findUserByAuth :: Auth -> m (Maybe (UserId, Bool))
   setEmailAsVerified :: VerificationCode -> m (Either EmailVerificationError ())
+
+class Monad m => SessionRepo m where
+  newSession :: UserId -> m SessionId
+  findUserBySessionId :: SessionId -> m (Maybe UserId)
 
 class Monad m =>
       EmailVerificationNotif m
@@ -81,9 +94,17 @@ instance EmailVerificationNotif IO where
   notifyEmailVerification email vcode =
     putStrLn $ "Notify " <> rawEmail email <> " - " <> vcode
 
-verifyEmail :: AuthRepo m => VerificationCode -> m (Either EmailVerificationError ())
-verifyEmail = setEmailAsVerified
+login :: (AuthRepo m, SessionRepo m) => Auth -> m (Either LoginError SessionId)
+login auth = runExceptT $ do
+  result <- lift $ findUserByAuth auth
+  case result of
+    Nothing           -> throwError LoginErrorInvalidAuth
+    Just (_  , False) -> throwError LoginErrorEmailNotVerified
+    Just (uId, _    ) -> lift $ newSession uId
 
+verifyEmail
+  :: AuthRepo m => VerificationCode -> m (Either EmailVerificationError ())
+verifyEmail = setEmailAsVerified
 
 register
   :: (AuthRepo m, EmailVerificationNotif m)
@@ -93,3 +114,8 @@ register auth = runExceptT $ do
   vCode <- ExceptT $ addAuth auth
   let email = authEmail auth
   lift $ notifyEmailVerification email vCode
+
+resolveSessionId :: SessionRepo m => SessionId -> m (Maybe UserId)
+resolveSessionId = findUserBySessionId
+
+
