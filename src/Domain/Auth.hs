@@ -2,6 +2,29 @@
 
 module Domain.Auth
   ( someFunc
+  , Auth(..)
+  , Email
+  , mkEmail
+  , rawEmail
+  , Password
+  , mkPassword
+  , rawPassword
+  , UserId
+  , VerificationCode
+  , SessionId
+  , RegistrationError(..)
+  , EmailVerificationError(..)
+  , LoginError(..)
+   -- * Ports
+  , AuthRepo(..)
+  , EmailVerificationNotif(..)
+  , SessionRepo(..)
+   -- * Use cases
+  , register
+  , verifyEmail
+  , login
+  , resolveSessionId
+  , getUser
   ) where
 
 import           ClassyPrelude
