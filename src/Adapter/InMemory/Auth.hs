@@ -24,24 +24,27 @@ initialState = State { stateAuths            = []
 
 type InMemory r m = (Has (TVar State) r, MonadReader r m, MonadIO m)
 
-addAuth :: InMemory r m => Auth -> m (Either RegistrationError VerificationCode)
+addAuth
+  :: InMemory r m => D.Auth -> m (Either D.RegistrationError D.VerificationCode)
 addAuth = undefined
 
 setEmailAsVerified
-  :: InMemory r m => VerificationCode -> m (Either EmailVerificationError ())
+  :: InMemory r m
+  => D.VerificationCode
+  -> m (Either D.EmailVerificationError ())
 setEmailAsVerified = undefined
 
-findUserByAuth :: InMemory r m => Auth -> m (Maybe (UserId, Bool))
+findUserByAuth :: InMemory r m => D.Auth -> m (Maybe (D.UserId, Bool))
 findUserByAuth = undefined
 
-findEmailFromUserId :: InMemory r m => UserId -> m (Maybe Email)
+findEmailFromUserId :: InMemory r m => D.UserId -> m (Maybe D.Email)
 findEmailFromUserId = undefined
 
-notifyEmailVerification :: InMemory r m => Email -> VerificationCode -> m ()
+notifyEmailVerification :: InMemory r m => D.Email -> D.VerificationCode -> m ()
 notifyEmailVerification = undefined
 
-newSession :: InMemory r m => UserId -> m SessionId
+newSession :: InMemory r m => D.UserId -> m D.SessionId
 newSession = undefined
 
-findUserIdBySessionId :: InMemory r m => SessionId -> m (Maybe UserId)
+findUserIdBySessionId :: InMemory r m => D.SessionId -> m (Maybe D.UserId)
 findUserIdBySessionId = undefined

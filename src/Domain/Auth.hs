@@ -37,7 +37,7 @@ someFunc = putStrLn "someFunc"
 
 newtype Email = Email
   { emailRaw :: Text
-  } deriving (Show, Eq)
+  } deriving (Show, Eq, Ord)
 
 rawEmail :: Email -> Text
 rawEmail = emailRaw
