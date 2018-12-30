@@ -26,6 +26,7 @@ dependencies:
   - data-has
   - mtl
   - pcre-heavy
+  - string-random
   - time
 
 library:
