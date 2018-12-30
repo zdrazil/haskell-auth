@@ -41,13 +41,27 @@ findUserByAuth = undefined
 findEmailFromUserId :: InMemory r m => D.UserId -> m (Maybe D.Email)
 findEmailFromUserId = undefined
 
+getNotificationsForEmail
+  :: InMemory r m => D.Email -> m (Maybe D.VerificationCode)
+getNotificationsForEmail email = do
+  tvar  <- asks getter
+  state <- liftIO $ readTVarIO tvar
+  return $ lookup email $ stateNotifications state
+
 notifyEmailVerification :: InMemory r m => D.Email -> D.VerificationCode -> m ()
-notifyEmailVerification = undefined
+notifyEmailVerification email vCode = do
+  tvar <- asks getter
+  atomically $ do
+    state <- readTVar tvar
+    let notifications    = stateNotifications state
+        newNotifications = insertMap email vCode notifications
+        newState         = state { stateNotifications = newNotifications }
+    writeTVar tvar newState
 
 newSession :: InMemory r m => D.UserId -> m D.SessionId
 newSession uId = do
   tvar <- asks getter
-  sId  <- liftIO $ ((tshow uId) <>) <$> stringRandomIO "[A-Za-z0-9]{16}"
+  sId  <- liftIO $ (tshow uId <>) <$> stringRandomIO "[A-Za-z0-9]{16}"
   atomically $ do
     state <- readTVar tvar
     let sessions    = stateSessions state
